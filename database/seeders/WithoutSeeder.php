@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class WithoutSeeder extends Seeder
-{
+{   
     public function run(): void
     {
         DB::table('withouts')->insert([

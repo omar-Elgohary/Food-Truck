@@ -7,15 +7,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sections', function (Blueprint $table) {
+        Schema::create('offers', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('sections');
+        Schema::dropIfExists('offers');
     }
 };

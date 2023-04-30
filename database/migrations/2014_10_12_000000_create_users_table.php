@@ -10,8 +10,9 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('phone', 12)->unique();
+            $table->string('phone')->unique();
             $table->string('password');
+            $table->boolean('isVerified')->default(false);
             $table->enum('type', ['admin', 'customer', 'seller'])->default('customer');  // 0 => admin, 1 => customer, 2 => seller
 
             $table->string('vehicle_name')->nullable();

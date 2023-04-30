@@ -1,8 +1,10 @@
 <?php
 namespace App\Http\Controllers\Api;
+use App\Models\User;
 use App\Models\Image;
 use App\Models\Product;
-use App\Models\WithOut;
+use App\Models\Section;
+use App\Models\Without;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +18,7 @@ class ProductController extends Controller
     public function allProducts()
     {
         try{
-            $products = Product::all();
+            $products = Product::where('user_id',  auth()->user()->id)->get();
             foreach($products as $product){
                 $product->images = Image::where('product_id', $product->id)->get();
             }
@@ -28,6 +30,7 @@ class ProductController extends Controller
                 return $this->returnError(400, 'There Is No Products');
             }
         }catch(\Exception $e){
+            echo $e;
             return $this->returnError(400, 'All Products get Failed');
         }
     }
@@ -51,6 +54,7 @@ class ProductController extends Controller
             if(Auth::user()->type == 'seller'){
                $without = implode(',', $request->without_id) ;
                 $product = Product::create([
+                    'user_id' => auth()->user()->id,
                     'section_id' => $request->section_id,
                     'name' => $request->name,
                     'price' => $request->price,
@@ -106,6 +110,7 @@ class ProductController extends Controller
                 if(Auth::user()->type == 'seller'){
                 $without = implode(',', $request->without_id) ;
                     $product->update([
+                        'user_id' => auth()->user()->id,
                         'section_id' => $request->section_id,
                         'name' => $request->name,
                         'price' => $request->price,
@@ -135,7 +140,7 @@ class ProductController extends Controller
                 }
                     return $this->returnData(201, 'Product Updated Successfully', compact('product', 'withouts', 'images'));
                 }else{
-                    return $this->returnError(400, "U Can't Add Product as U aren't A Seller");
+                    return $this->returnError(400, "U Can't Edit Product as U aren't A Seller");
                 }
             }else{
                 return $this->returnError(400, "Product Doesn't Exists");
@@ -162,6 +167,67 @@ class ProductController extends Controller
         }catch(\Exception $e){
             echo $e;
             return $this->returnError(400, 'Product Deleted Failed');
+        }
+    }
+
+
+
+
+    public function getAllProductsSeller(Request $request, $seller_id)
+    {
+        try{
+            $seller = User::find($seller_id);
+            if($seller && $seller->type == 'seller'){
+                $products = Product::where('user_id', $seller_id)->with('section')->get();
+                foreach($products as $product){
+                    $product->images = Image::where('product_id', $product->id)->get();
+
+                    foreach(explode(',',  $product->without_id) as $without){
+                        $without = Without::where('id', $product->without_id)->first();
+                        $withouts[] = $without->name;
+                    }
+                }
+                return $this->returnData(200, 'Products Returned Successfully', $products);
+            }else{
+                return $this->returnError(400, "Seller Doesn't Exists");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(400, 'Products Returned Failed');
+        }
+    }
+
+
+
+
+    public function getSpecificeProductsSeller(Request $request, $seller_id, $section_id)
+    {
+        try{
+            $seller = User::find($seller_id);
+            $section = Section::find($section_id);
+            if($seller && $seller->type == 'seller'){
+                $products = Product::where('user_id', $seller_id)->with('section')->get();
+                foreach($products as $product){
+                    $product->images = Image::where('product_id', $product->id)->get();
+                }
+                foreach(explode(',',  $product->without_id) as $without){
+                    $without = Without::where('id', $without)->first();
+                    $withouts[] = $without->name;
+                }
+
+                if($section){
+                    $products = $products->where('section_id', $section_id)->all();
+                    return $this->returnData(200, 'Products Returned Successfully', $products);
+                }else{
+                    return $this->returnError(400, "Section Doesn't Exists");
+                }
+                return $this->returnData(200, 'Products Returned Successfully', $products);
+            }else{
+                return $this->returnError(400, "Seller Doesn't Exists");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(400, 'Products Returned Failed');
         }
     }
 }

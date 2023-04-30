@@ -156,14 +156,15 @@ return [
 
     'providers' => ServiceProvider::defaultProviders()->merge([
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-
+        * Package Service Providers...
+        */
+        
         /*
-         * Application Service Providers...
-         */
+        * Application Service Providers...
+        */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
@@ -186,6 +187,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ])->toArray(),
 
 ];

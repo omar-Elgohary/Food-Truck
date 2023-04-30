@@ -1,5 +1,7 @@
 <?php
 namespace App\Models;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\FoodType;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
@@ -59,8 +61,20 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserImage::class);
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+
     public function foodtypes()
     {
         return $this->hasMany(FoodType::class, 'food_type_id');
+    }
+
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 }

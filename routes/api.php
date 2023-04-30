@@ -3,17 +3,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MainController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SectionController;
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
-    Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/verify', [AuthController::class, 'verify']);
+    Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);    
-    
-    
+
+
     // Sections
     Route::get('allSections', [SectionController::class, 'allSections'])->name('allSections');
     Route::post('addSection', [SectionController::class, 'addSection'])->name('addSection');
@@ -25,5 +26,15 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('addProduct', [ProductController::class, 'addProduct'])->name('addProduct');
     Route::post('editProduct/{id}', [ProductController::class, 'editProduct'])->name('editProduct');
     Route::delete('deleteProduct/{id}', [ProductController::class, 'deleteProduct'])->name('deleteProduct');
+
+
+    // Get Seller Products
+    Route::get('getAllProductsSeller/{seller_id}', [ProductController::class, 'getAllProductsSeller']);
+    Route::get('getSpecificeProductsSeller/{seller_id}/{section_id}', [ProductController::class, 'getSpecificeProductsSeller']);
+
+
+    
+    // Orders
+    Route::post('makeOrder/{seller_id}', [OrderController::class, 'makeOrder']);
 });
 

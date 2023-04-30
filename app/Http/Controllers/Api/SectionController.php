@@ -28,7 +28,6 @@ class SectionController extends Controller
             ]);
 
             $section = Section::create([
-                'user_id' => auth('api')->user()->id,
                 'name' => $request->name,
             ]);
             return $this->returnData(200, 'Section Added Successfully', $section);
