@@ -23,6 +23,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('addFoodType', [MainController::class, 'addFoodType'])->name('addFoodType');
 
     Route::get('allProducts', [ProductController::class, 'allProducts'])->name('allProducts');
+    Route::get('getProduct/{id}', [ProductController::class, 'getProduct'])->name('getProduct');
     Route::post('addProduct', [ProductController::class, 'addProduct'])->name('addProduct');
     Route::post('editProduct/{id}', [ProductController::class, 'editProduct'])->name('editProduct');
     Route::delete('deleteProduct/{id}', [ProductController::class, 'deleteProduct'])->name('deleteProduct');
@@ -35,6 +36,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
 
     
     // Orders
-    Route::post('makeOrder/{seller_id}', [OrderController::class, 'makeOrder']);
+    Route::get('allOrders', [OrderController::class, 'allOrders']);
+    Route::post('makeOrder/{seller_id}/{section_id}', [OrderController::class, 'makeOrder']);
+    
 });
 

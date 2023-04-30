@@ -15,9 +15,6 @@ return new class extends Migration
             $table->double('price');
             $table->double('calories');
             $table->text('description');
-
-            $table->enum('spicy', [0, 1])->default(0);  // 0 => notSpicy, 1 => spicy
-            $table->string('without_id')->nullable();
             $table->timestamps();
         });
     }

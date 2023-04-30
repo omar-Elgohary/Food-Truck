@@ -22,8 +22,5 @@ class Product extends Model
         return $this->belongsTo(Section::class);
     }
 
-    public function withouts()
-    {
-        return $this->hasMany(Without::class, 'without_id');
-    }
+
 }

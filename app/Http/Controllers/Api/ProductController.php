@@ -18,12 +18,10 @@ class ProductController extends Controller
     public function allProducts()
     {
         try{
-            $products = Product::where('user_id',  auth()->user()->id)->get();
+            $products = Product::where('seller_id', auth()->user()->id)->with('section')->get();
             foreach($products as $product){
                 $product->images = Image::where('product_id', $product->id)->get();
             }
-            return $this->returnData(200, 'All Products get Successfully', $products);
-            $products['images'] = Image::where('product_id', $product->id);
             if($products->count() > 0){
                 return $this->returnData(200, 'All Products get Successfully', $products);
             }else{
@@ -37,6 +35,32 @@ class ProductController extends Controller
 
 
 
+
+    public function getProduct(Request $request, $id)
+    {
+        try{
+            $product = Product::find($id);
+            if(!$product){
+                return $this->returnError(400, "Product Doesn't Exist");
+            }
+            $product = Product::where('id', $id)->with('section', 'images')->first();
+            $product['seller'] = User::where('id', $product->seller_id)->first();
+            if($product){
+                return $this->returnData(200, 'Product get Successfully', compact('product'));
+            }else{
+                return $this->returnError(400, "Product Doesn't Exist");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(400, 'Product get Failed');
+        }
+    }
+
+
+
+
+
+
     public function addProduct(Request $request)
     {
         try {
@@ -47,21 +71,17 @@ class ProductController extends Controller
                 'price' => 'required',
                 'calories' => 'required',
                 'description' => 'required',
-                'spicy' => 'nullable',
-                'without_id' => 'nullable',
             ]);
             
             if(Auth::user()->type == 'seller'){
-               $without = implode(',', $request->without_id) ;
+            //    $without = implode(',', $request->without_id) ;
                 $product = Product::create([
-                    'user_id' => auth()->user()->id,
+                    'seller_id' => auth()->user()->id,
                     'section_id' => $request->section_id,
                     'name' => $request->name,
                     'price' => $request->price,
                     'calories' => $request->calories,
                     'description' => $request->description,
-                    'spicy' => $request->spicy,
-                    'without_id' => $without,
                 ]);
 
                 if($request->hasFile('images')){
@@ -75,12 +95,12 @@ class ProductController extends Controller
                     ]);
                 }  
             }
-           $images = $product->images()->get();
-           foreach(explode(',',  $product->without_id) as $without){
-                $without = Without::where('id', $without)->first();
-                $withouts[] = $without->name;
-           }
-                return $this->returnData(201, 'Product Created Successfully', compact('product','withouts', 'images'));
+            $images = $product->images()->get();
+            // foreach(explode(',',  $product->without_id) as $without){
+            //     $without = Without::where('id', $without)->first();
+            //     $withouts[] = $without->name;
+            // }
+                return $this->returnData(201, 'Product Created Successfully', compact('product', 'images'));
             }else{
                 return $this->returnError(400, "U Can't Add Product as U aren't A Seller");
             }
@@ -101,23 +121,18 @@ class ProductController extends Controller
                 'price' => 'required',
                 'calories' => 'required',
                 'description' => 'required',
-                'spicy' => 'nullable',
-                'without_id' => 'nullable',
             ]);
 
             $product = Product::find($id);
             if($product){
                 if(Auth::user()->type == 'seller'){
-                $without = implode(',', $request->without_id) ;
                     $product->update([
-                        'user_id' => auth()->user()->id,
+                        'seller_id' => auth()->user()->id,
                         'section_id' => $request->section_id,
                         'name' => $request->name,
                         'price' => $request->price,
                         'calories' => $request->calories,
                         'description' => $request->description,
-                        'spicy' => $request->spicy,
-                        'without_id' => $without,
                     ]);
 
                     if($request->hasFile('images')){
@@ -132,13 +147,8 @@ class ProductController extends Controller
                             ]);
                         } 
                     }
-
-                $images = $product->images()->get();
-                foreach(explode(',',  $product->without_id) as $without){
-                    $without = Without::where('id', $without)->first();
-                    $withouts[] = $without->name;
-                }
-                    return $this->returnData(201, 'Product Updated Successfully', compact('product', 'withouts', 'images'));
+                    $images = $product->images()->get();
+                    return $this->returnData(201, 'Product Updated Successfully', compact('product', 'images'));
                 }else{
                     return $this->returnError(400, "U Can't Edit Product as U aren't A Seller");
                 }
@@ -181,11 +191,6 @@ class ProductController extends Controller
                 $products = Product::where('user_id', $seller_id)->with('section')->get();
                 foreach($products as $product){
                     $product->images = Image::where('product_id', $product->id)->get();
-
-                    foreach(explode(',',  $product->without_id) as $without){
-                        $without = Without::where('id', $product->without_id)->first();
-                        $withouts[] = $without->name;
-                    }
                 }
                 return $this->returnData(200, 'Products Returned Successfully', $products);
             }else{
@@ -210,11 +215,6 @@ class ProductController extends Controller
                 foreach($products as $product){
                     $product->images = Image::where('product_id', $product->id)->get();
                 }
-                foreach(explode(',',  $product->without_id) as $without){
-                    $without = Without::where('id', $without)->first();
-                    $withouts[] = $without->name;
-                }
-
                 if($section){
                     $products = $products->where('section_id', $section_id)->all();
                     return $this->returnData(200, 'Products Returned Successfully', $products);
