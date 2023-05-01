@@ -13,38 +13,26 @@ class OrderController extends Controller
 {
     use ApiResponseTrait;
 
-    public function allOrders(Request $request)
-    {
-        try{
-            $orders = Order::get();
-            foreach($orders as $order){
-                $order['customer'] = User::where('id', $order['customer_id'])->get();
-                $order['seller'] = User::where('id', $order['seller_id'])->get();
-                $order['product'] = Product::where('id', $order['product_id'])->get();
-            }
-            return $this->returnData(200, 'Orders Returned Successfully', $orders);
-        }catch(\Exception $e){
-            echo $e;
-            return $this->returnError(400, "Orders Returned Failed");
-        }
-    }
-
-
-
-
-
     public function makeOrder(Request $request, $seller_id, $section_id)
     {
         try{
             $seller = User::find($seller_id);
             $section = Section::find($section_id);
-            if(!$seller || $seller->type != 'seller' || !$section){
-                return $this->returnError(400, "Seller or Section Not Found");
+            if(auth()->user()->type != 'customer'){
+                return $this->returnError(401, "You Can't make order as you aren't a Customer");
+            }
+
+            if(!$seller || $seller->type != 'seller'){
+                return $this->returnError(404, "Seller Not Found");
+            }
+
+            if(!$section){
+                return $this->returnError(404, "Section Not Found");
             }
             $without = implode(',', $request->without_id) ;
 
             if($request->product_id == null){
-                return $this->returnError(400, "Product Not Found");
+                return $this->returnError(404, "Product Not Found");
             }
             $order = Order::create([
                 'customer_id' => auth()->user()->id,
@@ -65,11 +53,13 @@ class OrderController extends Controller
             return $this->returnData(201, 'Make Order Successfully', compact('order', 'withouts'));
         }catch(\Exception $e){
             echo $e;
-            return $this->returnError(400, "Make Order Failed");
+            return $this->returnError(404, "Make Order Failed");
         }
         
     }
 
 
+
+    
 
 }

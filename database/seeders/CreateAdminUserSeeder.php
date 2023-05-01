@@ -9,10 +9,29 @@ class CreateAdminUserSeeder extends Seeder
     public function run()
     {
         $user = User::create([
-            'name' => 'Omar ElGohary',
-            'phone' => '01156513661',
+            'name' => 'Admin',
+            'phone' => '01234567890',
             'password' => bcrypt('12345678'),
             'type' => 'admin',
+        ]);
+
+        $user = User::create([
+            'name' => 'Sara Mohamed',
+            'phone' => '01018611653',
+            'password' => bcrypt('12345678'),
+            'type' => 'customer',
+        ]);
+
+        $user = User::create([
+            'name' => 'Mahmoud ElSayed',
+            'phone' => '01015696025',
+            'password' => bcrypt('12345678'),
+            'type' => 'seller',
+            'vehicle_name' => 'Honda',
+            'plate_num' => '12345678',
+            'food_type_id' => 1,
+            'food_truck_licence' => 'food_truck_licence',
+            'vehicle_image' => 'vehicle_image',
         ]);
     }
 }

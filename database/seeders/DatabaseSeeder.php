@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
 
 
             $this->call([
-                CreateAdminUserSeeder::class,
                 FoodTypeSeeder::class,
+                CreateAdminUserSeeder::class,
                 WithoutSeeder::class,
                 SectionsSeeder::class,
             ]);

@@ -74,7 +74,10 @@ class ProductController extends Controller
             ]);
             
             if(Auth::user()->type == 'seller'){
-            //    $without = implode(',', $request->without_id) ;
+                if(Auth::user()->isVerified == 0){
+                    return $this->returnError(400, 'Please Verify Your Account');
+                }
+                // $without = implode(',', $request->without_id);
                 $product = Product::create([
                     'seller_id' => auth()->user()->id,
                     'section_id' => $request->section_id,
@@ -83,6 +86,7 @@ class ProductController extends Controller
                     'calories' => $request->calories,
                     'description' => $request->description,
                 ]);
+                $product['section'] = Section::find($request->section_id)->name;
 
                 if($request->hasFile('images')){
                 foreach($request->file('images') as $image){
@@ -183,12 +187,12 @@ class ProductController extends Controller
 
 
 
-    public function getAllProductsSeller(Request $request, $seller_id)
+    public function getAllProductsSeller($seller_id)
     {
         try{
             $seller = User::find($seller_id);
             if($seller && $seller->type == 'seller'){
-                $products = Product::where('user_id', $seller_id)->with('section')->get();
+                $products = Product::where('seller_id', $seller_id)->with('section')->get();
                 foreach($products as $product){
                     $product->images = Image::where('product_id', $product->id)->get();
                 }
@@ -211,7 +215,7 @@ class ProductController extends Controller
             $seller = User::find($seller_id);
             $section = Section::find($section_id);
             if($seller && $seller->type == 'seller'){
-                $products = Product::where('user_id', $seller_id)->with('section')->get();
+                $products = Product::where('seller_id', $seller_id)->with('section')->get();
                 foreach($products as $product){
                     $product->images = Image::where('product_id', $product->id)->get();
                 }

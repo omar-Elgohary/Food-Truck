@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\SellerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\CustomerController;
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('/register', [AuthController::class, 'register']);
@@ -20,8 +22,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('addSection', [SectionController::class, 'addSection'])->name('addSection');
     Route::post('editSection/{id}', [SectionController::class, 'editSection'])->name('editSection');
     
+
+    // Food Type
     Route::post('addFoodType', [MainController::class, 'addFoodType'])->name('addFoodType');
 
+
+    // Products
     Route::get('allProducts', [ProductController::class, 'allProducts'])->name('allProducts');
     Route::get('getProduct/{id}', [ProductController::class, 'getProduct'])->name('getProduct');
     Route::post('addProduct', [ProductController::class, 'addProduct'])->name('addProduct');
@@ -34,10 +40,18 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::get('getSpecificeProductsSeller/{seller_id}/{section_id}', [ProductController::class, 'getSpecificeProductsSeller']);
 
 
+    // Customers
+    Route::get('myOrders', [CustomerController::class, 'myOrders']);
+
+
+    // Sellers
+    Route::get('myOrders', [SellerController::class, 'myOrders']);
     
-    // Orders
-    Route::get('allOrders', [OrderController::class, 'allOrders']);
+    
+    // Orders | Cart
+    // user make order must be cutomer type
     Route::post('makeOrder/{seller_id}/{section_id}', [OrderController::class, 'makeOrder']);
+    
     
 });
 
