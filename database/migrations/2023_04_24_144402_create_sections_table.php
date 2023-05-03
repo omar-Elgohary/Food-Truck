@@ -9,6 +9,8 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('food_type_id')->constrained('food_types')->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });

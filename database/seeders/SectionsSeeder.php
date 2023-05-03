@@ -7,25 +7,29 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 class SectionsSeeder extends Seeder
 {
     public function run(): void
-    {
+    { 
         DB::table('sections')->insert([
-            'name' => 'Meat',
+            'seller_id' => '3',
+            'food_type_id' => '1',
+            'name' => 'Fishes',        
+        ]);
+        
+        DB::table('sections')->insert([
+            'seller_id' => '4',
+            'food_type_id' => '2',
+            'name' => 'Burgers',
         ]);
 
         DB::table('sections')->insert([
-            'name' => 'Chicken',
-        ]);
-
-        DB::table('sections')->insert([
+            'seller_id' => '5',
+            'food_type_id' => '3',
             'name' => 'Vegan',
         ]);
 
         DB::table('sections')->insert([
-            'name' => 'Desserts',
-        ]);
-        
-        DB::table('sections')->insert([
-            'name' => 'Drinks',
+            'seller_id' => '3',
+            'food_type_id' => '4',
+            'name' => 'Sweets',
         ]);
     }
 }

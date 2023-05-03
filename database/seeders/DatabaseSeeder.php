@@ -2,7 +2,9 @@
 namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\OrdersSeeder;
 use Database\Seeders\FoodTypeSeeder;
+use Database\Seeders\ProductsSeeder;
 use Database\Seeders\SectionsSeeder;
 use Database\Seeders\CreateAdminUserSeeder;
 
@@ -27,6 +29,7 @@ class DatabaseSeeder extends Seeder
                 CreateAdminUserSeeder::class,
                 WithoutSeeder::class,
                 SectionsSeeder::class,
+                ProductsSeeder::class,
             ]);
         }
 }

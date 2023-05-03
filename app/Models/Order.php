@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Models\Cart;
 use App\Models\User;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
@@ -24,5 +25,11 @@ class Order extends Model
     public function withouts()
     {
         return $this->hasMany(Without::class, 'without_id');
+    }
+
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
     }
 }

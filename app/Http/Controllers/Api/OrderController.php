@@ -13,7 +13,7 @@ class OrderController extends Controller
 {
     use ApiResponseTrait;
 
-    public function makeOrder(Request $request, $seller_id, $section_id)
+    public function makeOrder(Request $request, $seller_id, $section_id)    // add to cart
     {
         try{
             $seller = User::find($seller_id);
@@ -26,7 +26,7 @@ class OrderController extends Controller
                 return $this->returnError(404, "Seller Not Found");
             }
 
-            if(!$section){
+            if(!$section){ 
                 return $this->returnError(404, "Section Not Found");
             }
             $without = implode(',', $request->without_id) ;
@@ -46,9 +46,13 @@ class OrderController extends Controller
             $order['seller'] = User::where('id', $request->seller_id)->get();
             $order['product'] = Product::where('id', $request->product_id)->get();
 
-            foreach(explode(',',  $order->without_id) as $without){
-                $without = Without::where('id', $without)->first();
-                $withouts[] = $without->name;
+            if($request->without){
+                foreach(explode(',',  $order->without_id) as $without){
+                    $without = Without::where('id', $without)->first();
+                    $withouts[] = $without->name;
+                }
+            }else{
+                $withouts[] = null;
             }
             return $this->returnData(201, 'Make Order Successfully', compact('order', 'withouts'));
         }catch(\Exception $e){

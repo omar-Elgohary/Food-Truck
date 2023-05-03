@@ -17,6 +17,10 @@ class FoodTypeSeeder extends Seeder
         ]);
 
         DB::table('food_types')->insert([
+            'name' => 'Helthy Food',
+        ]);
+
+        DB::table('food_types')->insert([
             'name' => 'Desert',
         ]);
     }

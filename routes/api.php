@@ -2,6 +2,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SellerController;
@@ -48,10 +49,16 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::get('myOrders', [SellerController::class, 'myOrders']);
     
     
-    // Orders | Cart
+    // Carts
+    Route::post('addToCart/{seller_id}/{section_id}', [CartController::class, 'addToCart']);
+    Route::get('getCustomerCart', [CartController::class, 'getCustomerCart']);
+    
+    // Orders
     // user make order must be cutomer type
-    Route::post('makeOrder/{seller_id}/{section_id}', [OrderController::class, 'makeOrder']);
-    
-    
+    Route::post('makeOrder/{cart_id}', [OrderController::class, 'makeOrder']); // confirm order after add to cart
+
+
+    // Confirm Order In Cart
+    // Route::post('confirmOrder', [CartController::class, 'confirmOrder']);
 });
 
