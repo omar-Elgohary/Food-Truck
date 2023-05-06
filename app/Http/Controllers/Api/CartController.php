@@ -81,15 +81,26 @@ class CartController extends Controller
             // $cart['customer'] = User::where('id', auth()->user()->id)->get();
             // $cart['seller'] = User::where('id', $request->seller_id)->get();
 
-
-            $order = Order::create([
-                'customer_id' => auth()->user()->id,
-                'seller_id' => $seller_id,
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
-                'total' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
-            ]);
+            if($seller->deliveryPrice){
+                $order = Order::create([
+                    'customer_id' => auth()->user()->id,
+                    'seller_id' => $seller_id,
+                    'product_id' => $request->product_id,
+                    'quantity' => $request->quantity,
+                    'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+                    'deliveryPrice' => $seller->deliveryPrice,
+                    'total' => (Product::where('id', $request->product_id)->first()->price * $request->quantity) + ($seller->deliveryPrice),
+                ]);
+            }else{
+                $order = Order::create([
+                    'customer_id' => auth()->user()->id,
+                    'seller_id' => $seller_id,
+                    'product_id' => $request->product_id,
+                    'quantity' => $request->quantity,
+                    'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+                    'total' => (Product::where('id', $request->product_id)->first()->productPrice),
+                ]);
+            }
 
             $product = Product::where('id', $request->product_id)->get();
 

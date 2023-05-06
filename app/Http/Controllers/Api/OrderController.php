@@ -79,13 +79,13 @@ class OrderController extends Controller
 
             $orders = Order::where('customer_id', auth()->user()->id)->where('seller_id', $seller_id)->get();
             foreach($orders as $order){
-                if(!$request->deliveryPrice){
+                if(!$seller->deliveryPrice){
                     return $this->returnData(201, 'Confirm Order Successfully', compact('orders'));
                 }else{
                     $order->update([
                         'confirmed' => '1',
-                        'deliveryPrice' => $request->deliveryPrice,
-                        'total' => ($order->productPrice) + ($request->deliveryPrice),
+                        'deliveryPrice' => $seller->deliveryPrice,
+                        'total' => ($order->productPrice) + ($seller->deliveryPrice),
                     ]);
                 }
             }

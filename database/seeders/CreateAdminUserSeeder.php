@@ -32,6 +32,8 @@ class CreateAdminUserSeeder extends Seeder
             'food_type_id' => 1,
             'food_truck_licence' => 'food_truck_licence',
             'vehicle_image' => 'vehicle_image',
+            'delivery' => '1',
+            'deliveryPrice' => 5,
         ]);
 
         $user = User::create([
@@ -56,6 +58,8 @@ class CreateAdminUserSeeder extends Seeder
             'food_type_id' => 3,
             'food_truck_licence' => 'food_truck_licence',
             'vehicle_image' => 'vehicle_image',
+            'delivery' => '1',
+            'deliveryPrice' => 10,
         ]);
     }
 }

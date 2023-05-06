@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('food_truck_licence')->nullable();
             $table->string('vehicle_image')->nullable();
             $table->enum('delivery', [0, 1])->default(0);   // 0 => pickup, 1 => delivery
+            $table->double('deliveryPrice')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
