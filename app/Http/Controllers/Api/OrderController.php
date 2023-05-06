@@ -29,11 +29,12 @@ class OrderController extends Controller
             if(!$section){ 
                 return $this->returnError(404, "Section Not Found");
             }
-            $without = implode(',', $request->without_id) ;
+            $without = implode(',', $request->without_id);
 
             if($request->product_id == null){
                 return $this->returnError(404, "Product Not Found");
             }
+            
             $order = Order::create([
                 'customer_id' => auth()->user()->id,
                 'seller_id' => $seller_id,
@@ -64,6 +65,36 @@ class OrderController extends Controller
 
 
 
+    public function confirmOrder(Request $request, $seller_id)
+    {
+        try{
+            $seller = User::find($seller_id);
+            if(auth()->user()->type != 'customer'){
+                return $this->returnError(401, "You Can't confirm order as you aren't a Customer");
+            }
+
+            if(!$seller || $seller->type != 'seller'){
+                return $this->returnError(404, "Seller Not Found");
+            }
+
+            $orders = Order::where('customer_id', auth()->user()->id)->where('seller_id', $seller_id)->get();
+            foreach($orders as $order){
+                if(!$request->deliveryPrice){
+                    return $this->returnData(201, 'Confirm Order Successfully', compact('orders'));
+                }else{
+                    $order->update([
+                        'confirmed' => '1',
+                        'deliveryPrice' => $request->deliveryPrice,
+                        'total' => ($order->productPrice) + ($request->deliveryPrice),
+                    ]);
+                }
+            }
+            return $this->returnData(201, 'Confirm Order Successfully', compact('orders'));
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(404, "Confirm Order Failed");
+        }
+    }
     
 
 }

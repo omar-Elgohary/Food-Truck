@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Image;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Section;
 use App\Models\Without;
@@ -68,7 +69,7 @@ class CartController extends Controller
                 return $this->returnError(404, "Product Not Found");
             }
 
-            $order = Cart::create([
+            $cart = Cart::create([
                 'customer_id' => auth()->user()->id,
                 'seller_id' => $seller_id,
                 'product_id' => $request->product_id,
@@ -77,18 +78,29 @@ class CartController extends Controller
                 'quantity' => $request->quantity,
                 'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
             ]);
-            // $order['customer'] = User::where('id', auth()->user()->id)->get();
-            // $order['seller'] = User::where('id', $request->seller_id)->get();
+            // $cart['customer'] = User::where('id', auth()->user()->id)->get();
+            // $cart['seller'] = User::where('id', $request->seller_id)->get();
+
+
+            $order = Order::create([
+                'customer_id' => auth()->user()->id,
+                'seller_id' => $seller_id,
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity,
+                'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+                'total' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+            ]);
+
             $product = Product::where('id', $request->product_id)->get();
 
             if($request->without){
-                foreach(explode(',',  $order->without_id) as $without){
+                foreach(explode(',',  $cart->without_id) as $without){
                     $without = Without::where('id', $without)->first();
                     $withouts[] = $without->name;
                 }
             }else{
                 $product['withouts'] = null;
-                $order->without_id = null;
+                $cart->without_id = null;
             }
             return $this->returnData(201, 'Product Added To Cart Successfully', compact('product'));
         }catch(\Exception $e){
@@ -100,22 +112,23 @@ class CartController extends Controller
 
 
 
-    public function confirmOrder(Request $request)
+    public function deleteProductFromCart(Request $request, $product_id)
     {
         try{
-            $cart = Cart::where('customer_id', auth()->user()->id)->get();
-            foreach($cart as $c){
-                $cart_id = $c->id;
-                $cart['orderPrice'] = $c->orderPrice;
-                $cart['delivery_price'] = $c->delivery_price;
-                $cart['Total'] = $c->Total;
-            } 
-
-            return $this->returnData(201, 'Your Order Confirmed Successfully', compact('final_order', 'cart'));
+            $product = Product::find($product_id);
+            if(auth()->user()->type != 'customer'){
+                return $this->returnError(401, "You Can't delete product as you aren't a Customer");
+            }
+            if(!$product){
+                return $this->returnError(404, "Product Not Found");
+            }
+            $cart = Cart::where('customer_id', auth()->user()->id)->where('product_id', $product_id)->first();
+            $cart->delete();
+            return $this->returnData(201, 'Product Removed From Cart Successfully', $cart);
         }catch(\Exception $e){
             echo $e;
-            return $this->returnError(404, "Your Order Failed");
+            return $this->returnError(404, "Remove From Cart Failed");
         }
     }
-
+    
 }

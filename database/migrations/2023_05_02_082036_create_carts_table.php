@@ -9,9 +9,9 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constarained('users')->cascadeOnDelete();
-            $table->foreignId('seller_id')->constarained('users')->cascadeOnDelete();
-            $table->foreignId('product_id')->constarained('products')->cascadeOnDelete();
+            $table->foreignId('customer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->enum('spicy', [0, 1])->default(0);  // 0 => notSpicy, 1 => spicy
             $table->string('without_id')->nullable();
             $table->double('quantity')->default(1);

@@ -52,13 +52,18 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     // Carts
     Route::post('addToCart/{seller_id}/{section_id}', [CartController::class, 'addToCart']);
     Route::get('getCustomerCart', [CartController::class, 'getCustomerCart']);
+    Route::delete('deleteProductFromCart/{product_id}', [CartController::class, 'deleteProductFromCart']);
     
+
+    // Confirm Order In Cart
+    Route::post('confirmOrder/{seller_id}', [OrderController::class, 'confirmOrder']);
+
+
+
     // Orders
     // user make order must be cutomer type
     Route::post('makeOrder/{cart_id}', [OrderController::class, 'makeOrder']); // confirm order after add to cart
 
 
-    // Confirm Order In Cart
-    // Route::post('confirmOrder', [CartController::class, 'confirmOrder']);
 });
 
