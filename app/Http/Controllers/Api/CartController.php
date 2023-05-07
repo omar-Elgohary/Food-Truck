@@ -81,8 +81,14 @@ class CartController extends Controller
             // $cart['customer'] = User::where('id', auth()->user()->id)->get();
             // $cart['seller'] = User::where('id', $request->seller_id)->get();
 
+            $random_id = strtoupper('#'.substr(str_shuffle(uniqid()),0,6));
+            while(User::where('random_id', $random_id )->exists()){
+                $random_id = strtoupper('#'.substr(str_shuffle(uniqid()),0,6));
+            }
+
             if($seller->deliveryPrice){
                 $order = Order::create([
+                    'random_id' => $random_id,
                     'customer_id' => auth()->user()->id,
                     'seller_id' => $seller_id,
                     'product_id' => $request->product_id,
@@ -93,12 +99,13 @@ class CartController extends Controller
                 ]);
             }else{
                 $order = Order::create([
+                    'random_id' => $random_id,
                     'customer_id' => auth()->user()->id,
                     'seller_id' => $seller_id,
                     'product_id' => $request->product_id,
                     'quantity' => $request->quantity,
                     'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
-                    'total' => (Product::where('id', $request->product_id)->first()->productPrice),
+                    'total' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
                 ]);
             }
 
@@ -135,7 +142,13 @@ class CartController extends Controller
             }
             $cart = Cart::where('customer_id', auth()->user()->id)->where('product_id', $product_id)->first();
             $cart->delete();
-            return $this->returnData(201, 'Product Removed From Cart Successfully', $cart);
+
+            $order = Order::where('customer_id', auth()->user()->id)->where('product_id', $product_id)->first();
+            $order->delete();
+
+            $carts = Cart::where('customer_id', auth()->user()->id)->get();
+            $carts['Ordertotal'] = Cart::where('customer_id', auth()->user()->id)->sum('productPrice');
+            return $this->returnData(201, 'Product Removed From Cart Successfully', $carts);
         }catch(\Exception $e){
             echo $e;
             return $this->returnError(404, "Remove From Cart Failed");

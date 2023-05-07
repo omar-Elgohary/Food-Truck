@@ -9,6 +9,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('random_id');
             $table->foreignId('customer_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();            
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();

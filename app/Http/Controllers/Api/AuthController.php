@@ -57,18 +57,24 @@ class AuthController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(), 400);
         }
-
+        
         $token = getenv("TWILIO_AUTH_TOKEN");
         $twilio_sid = getenv("TWILIO_SID");
         $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
         $twilio = new Client($twilio_sid, $token);
         $twilio->verify->v2->services($twilio_verify_sid)
-            ->verifications
-            ->create($request->phone, "sms");
+        ->verifications
+        ->create($request->phone, "sms");
+        
+        $random_id = strtoupper('#'.substr(str_shuffle(uniqid()),0,6));
+            while(User::where('random_id', $random_id )->exists()){
+                $random_id = strtoupper('#'.substr(str_shuffle(uniqid()),0,6));
+            }
 
         if($request->food_type_id == null)
         {
             User::create(array_merge(
+                ['random_id' => $random_id],
                 ['name' => $request->name],
                 ['phone' => $request->phone],
                 ['password' => bcrypt($request->password)],

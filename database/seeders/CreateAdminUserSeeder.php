@@ -9,6 +9,7 @@ class CreateAdminUserSeeder extends Seeder
     public function run()
     {
         $user = User::create([
+            'random_id' => '#54854',
             'name' => 'Admin',
             'phone' => '+201234567890',
             'password' => bcrypt('12345678'),
@@ -16,6 +17,7 @@ class CreateAdminUserSeeder extends Seeder
         ]);
 
         $user = User::create([
+            'random_id' => '#67954',
             'name' => 'Sara Mohamed',
             'phone' => '+201018611653',
             'password' => bcrypt('12345678'),
@@ -23,6 +25,7 @@ class CreateAdminUserSeeder extends Seeder
         ]);
 
         $user = User::create([
+            'random_id' => '#17859',
             'name' => 'Mahmoud ElSayed',
             'phone' => '+201015696025',
             'password' => bcrypt('12345678'),
@@ -37,6 +40,7 @@ class CreateAdminUserSeeder extends Seeder
         ]);
 
         $user = User::create([
+            'random_id' => '#87986',
             'name' => 'Osama Gamal',
             'phone' => '+201015691035',
             'password' => bcrypt('12345678'),
@@ -49,6 +53,7 @@ class CreateAdminUserSeeder extends Seeder
         ]);
 
         $user = User::create([
+            'random_id' => '#45721',
             'name' => 'Amina Ali',
             'phone' => '+20104526025',
             'password' => bcrypt('12345678'),

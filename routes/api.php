@@ -4,11 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MainController;
+use App\Http\Controllers\Api\RateController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SellerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\ContactUsController;
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('/register', [AuthController::class, 'register']);
@@ -62,8 +65,24 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
 
     // Orders
     // user make order must be cutomer type
+    Route::get('getPendingOrders', [OrderController::class, 'getPendingOrders']);
+    Route::get('getProcessingOrders', [OrderController::class, 'getProcessingOrders']);
+    Route::get('getPreviousOrders', [OrderController::class, 'getPreviousOrders']);
+    Route::post('cancelOrder/{order_id}', [OrderController::class, 'cancelOrder']);
     Route::post('makeOrder/{cart_id}', [OrderController::class, 'makeOrder']); // confirm order after add to cart
 
 
+    // Seller Orders
+    Route::get('newOrders', [UserController::class, 'newOrders']);
+    Route::get('acceptPendingOrders/{customer_id}', [UserController::class, 'acceptPendingOrders']);
+    
+
+
+    // ContactUs
+    Route::post('sendContactUsMessage', [ContactUsController::class, 'sendContactUsMessage']);
+
+
+    //Rate
+    Route::post('rateSeller/{seller_id}', [RateController::class, 'rateSeller']);
 });
 

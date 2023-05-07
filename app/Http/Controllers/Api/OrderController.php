@@ -8,10 +8,109 @@ use App\Models\Without;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\ApiResponseTrait;
+use PhpParser\Node\Stmt\Foreach_;
 
 class OrderController extends Controller
 {
     use ApiResponseTrait;
+
+    public function getPendingOrders()
+    {
+        try{
+            if(auth()->user()->type == 'customer'){
+                $orders = Order::where('customer_id', auth()->user()->id)->where('status', 'pending')->get();
+                foreach($orders as $order){
+                    $order['seller'] = User::where('id', $orders->first()->seller_id)->get();
+                }
+                return $this->returnData(201, 'Pending Orders Returned Successfully', $orders);
+            }else{
+                return $this->returnError(404, "There Are No Orders as You Aren't a Customer");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(404, "There Are No Pending Orders");
+        }
+    }
+
+
+
+
+
+    public function getProcessingOrders()
+    {
+        try{
+            if(auth()->user()->type == 'customer'){
+                $orders = Order::where('customer_id', auth()->user()->id)->where('status', 'processing')->get();
+                foreach($orders as $order){
+                    $order['seller'] = User::where('id', $orders->first()->seller_id)->get();
+                }
+                return $this->returnData(201, 'Processing Orders Returned Successfully', $orders);
+            }else{
+                return $this->returnError(404, "There Are No Orders as You Aren't a Customer");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(404, "There Are No Processing Orders");
+        }
+    }
+
+
+
+
+
+    public function getPreviousOrders()
+    {
+        try{
+            if(auth()->user()->type == 'customer'){
+                $orders = Order::where('customer_id', auth()->user()->id)
+                ->where('status', 'deliverd')->orWhere('status', 'picked up')->orWhere('status', 'cancel_by_customer')
+                ->get();
+                foreach($orders as $order){
+                    $order['seller'] = User::where('id', $orders->first()->seller_id)->get();
+                }
+                return $this->returnData(201, 'Previous Orders Returned Successfully', $orders);
+            }else{
+                return $this->returnError(404, "There Are No Orders as You Aren't a Customer");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(404, "There Are No Previous Orders");
+        }
+    }
+
+
+
+
+
+    public function cancelOrder(Request $request, $order_id)
+    {
+        try{
+            $order = Order::find($order_id);
+            if(!$order){
+                return $this->returnError(404, "Order Not Found");
+            }
+            if($order->confirmed == 0){
+                return $this->returnError(404, "U Can't Cancel Order as Order isn't Confirmed");
+            }
+
+            if(auth()->user()->type == 'customer'){
+                $order->update(['status' => 'cancel_by_customer']);
+                $order['seller'] = User::where('id', $order->first()->seller_id)->get();
+                return $this->returnData(201, 'Previous Orders Returned Successfully', $order);
+            }else{
+                return $this->returnError(404, "There Are No Orders as You Aren't a Customer");
+            }
+        }catch(\Exception $e){
+            echo $e;
+            return $this->returnError(404, "There Are No Previous Orders");
+        } 
+    }
+
+
+
+
+
+
 
     public function makeOrder(Request $request, $seller_id, $section_id)    // add to cart
     {
