@@ -15,14 +15,14 @@ use App\Http\Controllers\Api\ApiResponseTrait;
 class CartController extends Controller
 {
     use ApiResponseTrait;
- 
+
 
     public function getCustomerCart(Request $request)
     {
         try{
             if(auth()->user()->type == 'customer'){
                 $carts = Cart::where('customer_id', auth()->user()->id)->get();
-                
+
                 foreach($carts as $cart){
                     $cart['quantity'] = Cart::where('product_id', $cart->product_id)->first()->quantity;
                     $cart['product'] = Product::where('id', $cart->product_id)->get();
@@ -42,25 +42,30 @@ class CartController extends Controller
 
 
 
-    public function addToCart(Request $request, $seller_id, $section_id)    // add to cart
+    public function addToCart(Request $request, $seller_id)    // add to cart
     {
         try{
             $this->validate($request, [
+                'section_id' => 'required',
                 'product_id' => 'required',
                 'without_id' => 'sometimes|nullable',
             ]);
 
             $seller = User::find($seller_id);
-            $section = Section::find($section_id);
+            $section = Section::find($request->section_id);
             if(auth()->user()->type != 'customer'){
                 return $this->returnError(401, "You Can't make order as you aren't a Customer");
+            }
+
+            if(auth()->user()->isVerified == 0){
+                return $this->returnError(401, "You Are Not Verified");
             }
 
             if(!$seller || $seller->type != 'seller'){
                 return $this->returnError(404, "Seller Not Found");
             }
 
-            if(!$section){ 
+            if(!$section){
                 return $this->returnError(404, "Section Not Found");
             }
             $without = implode(',', $request->without_id) ;
@@ -69,15 +74,34 @@ class CartController extends Controller
                 return $this->returnError(404, "Product Not Found");
             }
 
-            $cart = Cart::create([
-                'customer_id' => auth()->user()->id,
-                'seller_id' => $seller_id,
-                'product_id' => $request->product_id,
-                'spicy' => $request->spicy,
-                'without_id' => $without,
-                'quantity' => $request->quantity,
-                'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
-            ]);
+            $customer = Cart::where('customer_id', auth()->user()->id)->get();
+            if($customer->isEmpty()){
+                $cart = Cart::create([
+                    'customer_id' => auth()->user()->id,
+                    'seller_id' => $seller_id,
+                    'product_id' => $request->product_id,
+                    'spicy' => $request->spicy,
+                    'without_id' => $without,
+                    'quantity' => $request->quantity,
+                    'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+                ]);
+            }else{
+                $cart = $customer->first();
+                if($seller_id == $cart->seller_id){
+                    $cart = Cart::create([
+                        'customer_id' => auth()->user()->id,
+                        'seller_id' => $seller_id,
+                        'product_id' => $request->product_id,
+                        'spicy' => $request->spicy,
+                        'without_id' => $without,
+                        'quantity' => $request->quantity,
+                        'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
+                    ]);
+                }else{
+                    return $this->returnError(400, "U Must Empty Your Cart");
+                }
+            }
+
             // $cart['customer'] = User::where('id', auth()->user()->id)->get();
             // $cart['seller'] = User::where('id', $request->seller_id)->get();
 
@@ -154,5 +178,5 @@ class CartController extends Controller
             return $this->returnError(404, "Remove From Cart Failed");
         }
     }
-    
+
 }

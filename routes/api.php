@@ -18,14 +18,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::post('/verify', [AuthController::class, 'verify']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user-profile', [AuthController::class, 'userProfile']);    
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
 
 
     // Sections
     Route::get('allSections', [SectionController::class, 'allSections'])->name('allSections');
     Route::post('addSection', [SectionController::class, 'addSection'])->name('addSection');
     Route::post('editSection/{id}', [SectionController::class, 'editSection'])->name('editSection');
-    
+
 
     // Food Type
     Route::post('addFoodType', [MainController::class, 'addFoodType'])->name('addFoodType');
@@ -50,13 +50,13 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
 
     // Sellers
     Route::get('myOrders', [SellerController::class, 'myOrders']);
-    
-    
+
+
     // Carts
-    Route::post('addToCart/{seller_id}/{section_id}', [CartController::class, 'addToCart']);
+    Route::post('addToCart/{seller_id}', [CartController::class, 'addToCart']);
     Route::get('getCustomerCart', [CartController::class, 'getCustomerCart']);
     Route::delete('deleteProductFromCart/{product_id}', [CartController::class, 'deleteProductFromCart']);
-    
+
 
     // Confirm Order In Cart
     Route::post('confirmOrder/{seller_id}', [OrderController::class, 'confirmOrder']);
@@ -74,8 +74,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
 
     // Seller Orders
     Route::get('newOrders', [UserController::class, 'newOrders']);
+    Route::get('previousOrders', [UserController::class, 'previousOrders']);
+    Route::get('currnetOrders', [UserController::class, 'currnetOrders']);
+
     Route::get('acceptPendingOrders/{customer_id}', [UserController::class, 'acceptPendingOrders']);
-    
+    Route::get('rejectPendingOrders/{customer_id}', [UserController::class, 'rejectPendingOrders']);
+
 
 
     // ContactUs
