@@ -5,7 +5,6 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\MainController;
 use App\Http\Controllers\Api\RateController;
-use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SellerController;
 use App\Http\Controllers\Api\ProductController;
@@ -58,7 +57,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
     Route::delete('deleteProductFromCart/{product_id}', [CartController::class, 'deleteProductFromCart']);
 
 
-    // Confirm Order In Cart
+    // Confirm Order In Cart after add to cart
     Route::post('confirmOrder/{seller_id}', [OrderController::class, 'confirmOrder']);
 
 
@@ -73,12 +72,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router){
 
 
     // Seller Orders
-    Route::get('newOrders', [UserController::class, 'newOrders']);
-    Route::get('previousOrders', [UserController::class, 'previousOrders']);
-    Route::get('currnetOrders', [UserController::class, 'currnetOrders']);
+    Route::get('newOrders', [SellerController::class, 'newOrders']);
+    Route::get('previousOrders', [SellerController::class, 'previousOrders']);
+    Route::get('currnetOrders', [SellerController::class, 'currnetOrders']);
 
-    Route::get('acceptPendingOrders/{customer_id}', [UserController::class, 'acceptPendingOrders']);
-    Route::get('rejectPendingOrders/{customer_id}', [UserController::class, 'rejectPendingOrders']);
+    Route::get('acceptPendingOrders/{customer_id}', [SellerController::class, 'acceptPendingOrders']);
+    Route::get('rejectPendingOrders/{customer_id}', [SellerController::class, 'rejectPendingOrders']);
 
 
 

@@ -29,13 +29,15 @@ class CartController extends Controller
                     $cart['images'] = Image::where('product_id', $cart->product_id)->get();
                     // $cart['total'] =  Cart::where('product_id', $cart->product_id)->sum('productPrice');
                 }
-                $cart['Ordertotal'] = Cart::where('customer_id', auth()->user()->id)->sum('productPrice');
+                $Ordertotal = Cart::where('customer_id', auth()->user()->id)->sum('productPrice');
+                $sellerDelivery = User::where('id', $cart->seller_id)->first()->deliveryPrice;
+                $cart['Ordertotal'] = $Ordertotal + $sellerDelivery;
                 return $this->returnData(201, 'Cart Data Returned Successfully', $carts);
             }else{
                 return $this->returnError(404, "There Are No Products in Cart as You Are a Seller");
             }
         }catch(\Exception $e){
-            echo $e;
+            echo $e->getMessage();
              return $this->returnError(404, "There Are No Products in Cart");
         }
     }
@@ -53,6 +55,7 @@ class CartController extends Controller
 
             $seller = User::find($seller_id);
             $section = Section::find($request->section_id);
+
             if(auth()->user()->type != 'customer'){
                 return $this->returnError(401, "You Can't make order as you aren't a Customer");
             }
@@ -98,12 +101,18 @@ class CartController extends Controller
                         'productPrice' => (Product::where('id', $request->product_id)->first()->price) * ($request->quantity),
                     ]);
                 }else{
-                    return $this->returnError(400, "U Must Empty Your Cart");
+                    return $this->returnError(400, "Clear Your Cart");
                 }
             }
-
             // $cart['customer'] = User::where('id', auth()->user()->id)->get();
             // $cart['seller'] = User::where('id', $request->seller_id)->get();
+
+            $products = Product::where('seller_id', $seller_id)->get();
+            foreach($products as $product){
+                if($product->section_id != $request->section_id){
+                    return $this->returnError(404, "Section Not Aviiable");
+                }
+            }
 
             $random_id = strtoupper('#'.substr(str_shuffle(uniqid()),0,6));
             while(User::where('random_id', $random_id )->exists()){
@@ -146,7 +155,7 @@ class CartController extends Controller
             }
             return $this->returnData(201, 'Product Added To Cart Successfully', compact('product'));
         }catch(\Exception $e){
-            echo $e;
+            echo $e->getMessage();
             return $this->returnError(404, "Add To Cart Failed");
         }
     }
